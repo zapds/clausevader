@@ -115,16 +115,11 @@ def get_analysis(doc_id: UUID):
     }
 
 
-@app.post("/api/chat")
-async def chat_with_doc(request: Request):
+@app.get("/api/chat/stream")
+async def chat_with_doc_stream(document_id: UUID, message: str, user_id: int):
     db = SessionLocal()
-    data = await request.json()
 
-    doc_id = UUID(data.get("document_id"))
-    message = data.get("message", "")
-    user_id = int(data.get("user_id"))
-
-    doc = db.query(Document).filter(Document.id == doc_id).first()
+    doc = db.query(Document).filter(Document.id == document_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
@@ -139,14 +134,16 @@ async def chat_with_doc(request: Request):
         finally:
             chat = Chat(
                 user_id=user_id,
-                document_id=doc_id,
+                document_id=document_id,
                 user_message=message,
                 ai_response=full_reply
             )
             db.add(chat)
             db.commit()
+            yield "event: end\ndata: done\n\n"  # signal end of stream
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
+
 
 if __name__ == "__main__":
     import uvicorn
