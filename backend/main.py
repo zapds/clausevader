@@ -67,9 +67,14 @@ async def upload_file(
             document_id=doc_id,
             clause_text=clause['summary'],
             summary=clause['summary'],
+            pros=clause.get("pros"),
+            cons=clause.get("cons"),
+            suggested_rewrite=clause.get("suggested_rewrite"),
+            sith_view=clause.get("sith_view"),
             x=clause['x'],
             y=clause['y'],
-            impact=clause['impact']
+            impact=clause['impact'],
+            favorability_score=int((1 - clause['x']) * 100)
         )
         db.add(new_clause)
 
