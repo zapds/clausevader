@@ -26,4 +26,5 @@ async def ask_assistant(question, document_text, user_id):
         delta = chunk.choices[0].delta
         content = delta.get("content", "")
         if content:
+            print(content, end="", flush=True)
             yield content
