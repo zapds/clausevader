@@ -1,14 +1,18 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from uuid import uuid4
+from fastapi.responses import StreamingResponse
+from uuid import uuid4, UUID
 import os
 import shutil
+import openai
 
 from db import SessionLocal
 from models import User, Document, Clause, Chat, DocumentStatusEnum
 from utils.extract_text import extract_text_from_file
 from utils.clause_scoring import analyze_clauses
-from utils.chat_assistant import ask_assistant
+from utils.chat_assistant import ask_assistant  # <-- updated for streaming
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
@@ -28,14 +32,14 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 async def upload_file(
     file: UploadFile = File(...),
     role: str = Form(...),
-    user_id: str = Form(...)
+    user_id: int = Form(...)
 ):
     db = SessionLocal()
 
     if not (file.filename.endswith(".pdf") or file.filename.endswith(".docx")):
         raise HTTPException(status_code=400, detail="Only PDF or DOCX allowed.")
 
-    doc_id = str(uuid4())
+    doc_id = uuid4()
     save_path = os.path.join(UPLOAD_FOLDER, f"{doc_id}_{file.filename}")
 
     with open(save_path, "wb") as buffer:
@@ -47,6 +51,7 @@ async def upload_file(
         id=doc_id,
         user_id=user_id,
         filename=file.filename,
+        original_file_url=save_path,
         extracted_text=extracted_text,
         role=role,
         status=DocumentStatusEnum.processing
@@ -54,13 +59,13 @@ async def upload_file(
     db.add(new_doc)
     db.commit()
 
-    # Analyze document using OpenAI
+    # Analyze document
     analysis = analyze_clauses(extracted_text, role)
 
     # Save clauses to DB
     for clause in analysis['clause_graph']:
         new_clause = Clause(
-            id=clause['id'],
+            id=UUID(clause['id']) if isinstance(clause['id'], str) else clause['id'],
             document_id=doc_id,
             clause_text=clause['summary'],
             summary=clause['summary'],
@@ -74,11 +79,11 @@ async def upload_file(
     new_doc.status = DocumentStatusEnum.done
     db.commit()
 
-    return {"document_id": doc_id, "status": "processing"}
+    return {"document_id": str(doc_id), "status": "processing"}
 
 
 @app.get("/api/documents/{doc_id}/status")
-def check_status(doc_id: str):
+def check_status(doc_id: UUID):
     db = SessionLocal()
     doc = db.query(Document).filter(Document.id == doc_id).first()
     if not doc:
@@ -87,7 +92,7 @@ def check_status(doc_id: str):
 
 
 @app.get("/api/documents/{doc_id}/analysis")
-def get_analysis(doc_id: str):
+def get_analysis(doc_id: UUID):
     db = SessionLocal()
     doc = db.query(Document).filter(Document.id == doc_id).first()
     if not doc or doc.status != DocumentStatusEnum.done:
@@ -96,7 +101,7 @@ def get_analysis(doc_id: str):
     clauses = db.query(Clause).filter(Clause.document_id == doc_id).all()
     clause_graph = [
         {
-            "id": clause.id,
+            "id": str(clause.id),
             "x": clause.x,
             "y": clause.y,
             "summary": clause.summary,
@@ -117,23 +122,30 @@ async def chat_with_doc(request: Request):
     db = SessionLocal()
     data = await request.json()
 
-    doc_id = data.get("document_id")
+    doc_id = UUID(data.get("document_id"))
     message = data.get("message", "")
-    user_id = data.get("user_id", "anonymous")
+    user_id = int(data.get("user_id"))
 
     doc = db.query(Document).filter(Document.id == doc_id).first()
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
 
-    reply = ask_assistant(message, doc.extracted_text, user_id)
+    async def event_stream():
+        full_reply = ""
+        try:
+            async for token in ask_assistant(message, doc.extracted_text, user_id):
+                full_reply += token
+                yield f"data: {token}\n\n"
+        except Exception as e:
+            yield f"data: [Error] {str(e)}\n\n"
+        finally:
+            chat = Chat(
+                user_id=user_id,
+                document_id=doc_id,
+                user_message=message,
+                ai_response=full_reply
+            )
+            db.add(chat)
+            db.commit()
 
-    chat = Chat(
-        user_id=user_id,
-        document_id=doc_id,
-        user_message=message,
-        ai_response=reply
-    )
-    db.add(chat)
-    db.commit()
-
-    return {"reply": reply}
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
