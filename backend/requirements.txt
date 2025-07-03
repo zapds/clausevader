@@ -7,3 +7,4 @@ pdfplumber
 python-docx
 openai
 python-multipart
+sse-starlette
