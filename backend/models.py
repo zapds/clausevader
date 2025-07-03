@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Text, Integer, Float, ForeignKey, Enum, TIMESTAMP
+from sqlalchemy import JSON, Column, String, Text, Integer, Float, ForeignKey, Enum, TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 import uuid
