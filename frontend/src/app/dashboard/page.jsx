@@ -22,7 +22,7 @@ export default async function Page() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 space-y-4">
+    <div className="flex flex-col items-center max-w-4xl mx-auto mt-10 space-y-4">
       <h1 className="text-2xl font-semibold text-center">Your Documents</h1>
       {documents.length === 0 ? (
         <p className="text-center text-muted-foreground">No documents found.</p>
@@ -43,6 +43,11 @@ export default async function Page() {
           </Card>
         ))
       )}
+      <Button>
+      <Link href="/dashboard/new">
+        Analyze new Document
+      </Link>
+      </Button>
     </div>
   );
 }

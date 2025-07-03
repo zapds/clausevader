@@ -121,6 +121,26 @@
   }
 }
 
+@keyframes crawl {
+  0% {
+    transform: rotateX(25deg) translateY(100%);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(25deg) translateY(0%);
+    opacity: 1;
+  }
+}
+
+.animate-crawl {
+  animation: crawl 10s ease-out forwards;
+  transform-origin: bottom center;
+}
+
+
 .crawl-container {
   perspective: 300px;
   overflow: hidden;
