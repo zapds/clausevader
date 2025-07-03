@@ -120,3 +120,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+.crawl-container {
+  perspective: 300px;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.crawl-text {
+  transform-origin: 50% 100%;
+  transform: rotateX(20deg);
+  font-family: 'Open Sans', sans-serif;
+  text-align: justify;
+}
