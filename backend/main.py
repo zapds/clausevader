@@ -2,9 +2,6 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from uuid import uuid4, UUID
-import os
-import shutil
-import openai
 
 from db import SessionLocal
 from models import User, Document, Clause, Chat, DocumentStatusEnum
