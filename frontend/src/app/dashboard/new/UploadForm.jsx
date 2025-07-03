@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ export function UploadForm({ userId }) {
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [done, setDone] = useState(false);
 
   const inputRef = useRef(null);
 
@@ -54,7 +56,7 @@ export function UploadForm({ userId }) {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/upload", {
+      const res = await fetch("https://clausevader-production.up.railway.app/api/upload", {
         method: "POST",
         body: formData,
       });
@@ -72,6 +74,7 @@ export function UploadForm({ userId }) {
       toast.error("Failed to upload");
     } finally {
       setLoading(false);
+      setDone(true);
     }
   };
 
@@ -150,6 +153,18 @@ export function UploadForm({ userId }) {
       {errorMsg && (
         <p className=" text-red-500 text-sm">Error: {errorMsg}</p>
       )}
+      {loading && (
+        <p className="text-red-500 text-sm">Yes it takes a while please wait!</p>
+      )}
+      { done && (
+        <Button asChild>
+          <Link href="/dashboard">
+          View Analysis
+          </Link>
+        </Button>
+      )
+
+      }
     </form>
   );
 }

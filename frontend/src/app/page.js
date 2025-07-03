@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="bg-[url('/background.png')] bg-center min-h-screen font-sans flex flex-col crawl-container text-yellow-300">
+    <div className="bg-[url('/background.jpg')] bg-center min-h-screen font-sans flex flex-col crawl-container text-yellow-300">
       <section className="animate-crawl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 crawl-text">
         <div className="w-full max-w-3xl text-center mx-auto">
           <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight mb-6 leading-tight">
