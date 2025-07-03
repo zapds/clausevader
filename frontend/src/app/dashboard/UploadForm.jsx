@@ -20,6 +20,7 @@ export function UploadForm({ userId }) {
   const [role, setRole] = useState();
   const [loading, setLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const inputRef = useRef(null);
 
@@ -62,10 +63,13 @@ export function UploadForm({ userId }) {
 
       const data = await res.json();
       toast.success("Document uploaded!");
+      if (data.error) {
+        setErrorMsg(data.message)
+      }
       // TODO: Redirect or update UI
     } catch (err) {
       console.error(err);
-      toast.error("Failed to upload. Please try again.");
+      toast.error("Failed to upload");
     } finally {
       setLoading(false);
     }
@@ -143,6 +147,9 @@ export function UploadForm({ userId }) {
       <Button type="submit" disabled={loading}>
         {loading ? "Uploading..." : "Upload and Analyze"}
       </Button>
+      {errorMsg && (
+        <p className=" text-red-500 text-sm">Error: {errorMsg}</p>
+      )}
     </form>
   );
 }

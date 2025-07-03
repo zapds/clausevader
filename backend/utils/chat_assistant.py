@@ -1,7 +1,9 @@
-import openai
+from openai import OpenAI
 import os
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+import os
+
 
 async def ask_assistant(question, document_text, user_id):
     truncated_text = document_text[:3000] if document_text else "No contract text available."
@@ -12,18 +14,16 @@ async def ask_assistant(question, document_text, user_id):
         f"User Question:\n{question}"
     )
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": "You are a helpful legal contract assistant who is also a dark sith lord from star wars."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3,
-        stream=True
-    )
+    response = client.chat.completions.create(model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are a helpful legal contract assistant who is also a dark sith lord from star wars."},
+        {"role": "user", "content": prompt}
+    ],
+    temperature=0.3,
+    stream=True)
 
     for chunk in response:
-        delta = chunk['choices'][0]['delta']
+        delta = chunk.choices[0].delta
         content = delta.get("content", "")
         if content:
             yield content

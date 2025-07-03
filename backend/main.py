@@ -12,7 +12,6 @@ from utils.extract_text import extract_text_from_file
 from utils.clause_scoring import analyze_clauses
 from utils.chat_assistant import ask_assistant  # <-- updated for streaming
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
@@ -24,8 +23,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# UPLOAD_FOLDER = "uploads"
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 @app.post("/api/upload")
@@ -40,10 +39,10 @@ async def upload_file(
         raise HTTPException(status_code=400, detail="Only PDF or DOCX allowed.")
 
     doc_id = uuid4()
-    save_path = os.path.join(UPLOAD_FOLDER, f"{doc_id}_{file.filename}")
+    # save_path = os.path.join(UPLOAD_FOLDER, f"{doc_id}_{file.filename}")
 
-    with open(save_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # with open(save_path, "wb") as buffer:
+    #     shutil.copyfileobj(file.file, buffer)
 
     extracted_text = extract_text_from_file(file)
 
@@ -51,7 +50,7 @@ async def upload_file(
         id=doc_id,
         user_id=user_id,
         filename=file.filename,
-        original_file_url=save_path,
+        # original_file_url=save_path,
         extracted_text=extracted_text,
         role=role,
         status=DocumentStatusEnum.processing
@@ -61,6 +60,8 @@ async def upload_file(
 
     # Analyze document
     analysis = analyze_clauses(extracted_text, role)
+    if "error" in analysis and analysis["error"] == True:
+        return analysis
 
     # Save clauses to DB
     for clause in analysis['clause_graph']:
