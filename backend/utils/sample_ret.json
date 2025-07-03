@@ -1,0 +1,46 @@
+{
+    "favourability_score": 52,
+    "clause_graph": [
+      {
+        "summary": "Lease commencement and duration",
+        "x": 0.5,
+        "y": 0.3,
+        "impact": "neutral",
+        "clause": "This lease for purposes of payment of rent and period of lease shall be deemed to have commenced from ___________. This lease shall be in force for a period of_____ years certain from ___________. The Lessee shall, however, have the option to continue the lease thereafter for a further period upto __________ years.",
+        "id": "3c44fad1-88bc-4d27-af5d-c3072fa41c2c"
+      },
+      {
+        "summary": "Lessee's right to vacate",
+        "x": 0.2,
+        "y": 0.2,
+        "impact": "favourable",
+        "clause": "The Lessee shall be at liberty to vacate the 'Said Premises or part thereof' at any time during the period of lease on giving ________ month/s notice.",
+        "id": "09e39d16-251d-49ab-bfc6-2723fa5c6b86"
+      },
+      {
+        "summary": "Monthly rental payment",
+        "x": 0.7,
+        "y": 0.5,
+        "impact": "unfavourable",
+        "clause": "The Lessee shall pay to the Lessor/s in respect of the 'said premises' a monthly rental of Rs.____________ (Rupees _____________________________________________ only) for the certain period of lease and a monthly rental of Rs. __________ for the option period of lease payable within the fifth working day of each succeeding calendar month.",
+        "id": "5494bb55-a805-488d-b463-9fe8e3a158be"
+      },
+      {
+        "summary": "Security deposit",
+        "x": 0.6,
+        "y": 0.6,
+        "impact": "unfavourable",
+        "clause": "The Lessee has paid to the Lessor / s a sum of Rs. _________ only being ___________ month / s rent in respect of the 'said premises' as deposit of rent to be adjusted towards the rent for the last ____________ month / s of the tenancy.",
+        "id": "0d69397e-84a9-4494-b781-b5bd777dfbfe"
+      },
+      {
+        "summary": "Payment of taxes and levies",
+        "x": 0.4,
+        "y": 0.7,
+        "impact": "unfavourable",
+        "clause": "The payment of all taxes, rates, cess and other levy including penalties, if any, charged thereon in respect of the 'said premises', such as Corporation / Municipal / Panchayat Tax, Urban Land Tax, etc., due to the State Government, Central Government or other local or other civic, including enhancements and new introductions shall be to the account of the Lessor. The Lessee shall be at liberty to pay the above tax, rate or cess or other levy including penalties, if any, charged thereon in case of default.",
+        "id": "4791768d-06fb-475e-adf2-1be98601186b"
+      }
+    ]
+  }
+  
