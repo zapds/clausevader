@@ -1,8 +1,10 @@
-import openai
+from openai import OpenAI
+import os
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 import uuid
 import os
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def analyze_clauses(text, role="unsure"):
     prompt = f"""
@@ -20,13 +22,17 @@ Text:
 Return JSON list. No commentary.
     """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.4
-    )
+    response = client.chat.completions.create(model="gpt-4",
+    messages=[{"role": "user", "content": prompt}],
+    temperature=0.4)
 
-    result = eval(response['choices'][0]['message']['content'])
+    try:
+        result = eval(response.choices[0].message.content)
+    except SyntaxError:
+        return {
+            "error": True,
+            "message": response.choices[0].message.content
+        }
     for clause in result:
         clause["id"] = clause.get("id", str(uuid.uuid4()))
 
