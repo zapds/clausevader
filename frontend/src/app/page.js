@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, Flame } from "lucide-react";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -18,9 +19,11 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button className="bg-yellow-400 hover:bg-red-700 transition-all duration-300 text-white text-base sm:text-lg px-2 py-4 shadow-md shadow-red-500/30">
-              <Flame className="mr-2 h-5 w-5 text-black" /><span className="text-black">Enter the Dark Side</span>
-            </Button>
+            <Link href ="/dashboard">
+              <Button className="bg-yellow-400 hover:bg-red-700 transition-all duration-300 text-white text-base sm:text-lg px-2 py-4 shadow-md shadow-red-500/30">
+                <Flame className="mr-2 h-5 w-5 text-black" /><span className="text-black">Enter the Dark Side</span>
+              </Button>
+            </Link>
             <Button
               variant="outline"
               className="border-yellow-300 bg-transparent text-yellow-300 hover:bg-red-700 hover:border-red-700 transition-all duration-300 text-base sm:text-lg px-2 py-4"
