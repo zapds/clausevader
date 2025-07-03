@@ -28,10 +28,12 @@ export async function GET(request) {
     const claims = decodeIdToken(tokens.idToken());
     const googleUserId = claims.sub;
     const username = claims.name;
+    const picture = claims.picture;
 
     const existingUser = await getUserFromGoogleId(googleUserId);
     const sessionToken = await generateSessionToken();
-    const user = existingUser ?? await createUser(googleUserId, username);
+
+    const user = existingUser ?? await createUser(googleUserId, username, picture);
     const session = await createSession(sessionToken, user.id);
 
     await setSessionTokenCookie(cookieStore, sessionToken);

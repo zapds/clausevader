@@ -1,6 +1,7 @@
 import "./globals.css";
 import NavBar from "@/components/ui/navbar"; 
 import { getCurrentSession } from "@/lib/server/session";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 export const metadata = {
   title: "ClauseVader",
@@ -10,12 +11,19 @@ export const metadata = {
 export default async function RootLayout({ children }) {
   const { user } = await getCurrentSession();
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`antialiased bg-black text-white`}
+        className={`antialiased`}
       >
-        <NavBar user={user} /> {}
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NavBar user={user} /> {}
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

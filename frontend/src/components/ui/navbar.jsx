@@ -5,14 +5,8 @@ import { usePathname } from "next/navigation";
 import { Button } from "./button";
 import { Menu } from "lucide-react";
 
-
 export default function NavBar({ user }) {
   const pathname = usePathname();
-
-  const linkClass = (href) =>
-    `px-4 py-2 rounded hover:bg-red-700 ${
-      pathname === href ? "bg-red-800" : ""
-    }`;
 
   return (
     <nav className="bg-black text-white border-b border-red-900 shadow-md">

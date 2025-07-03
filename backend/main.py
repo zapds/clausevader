@@ -140,6 +140,7 @@ async def chat_with_doc_stream(document_id: UUID, message: str, user_id: int):
             )
             db.add(chat)
             db.commit()
+            
             yield "event: end\ndata: done\n\n"  # signal end of stream
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

@@ -24,8 +24,11 @@ Return JSON list. No commentary.
 
     use_cache = True
     if use_cache:
-        with open("sample_ret.json") as f:
-            return json.load(f)
+        with open("utils/sample_ret.json") as f:
+            sample_ret = json.load(f)
+            for clause in sample_ret["clause_graph"]:
+                clause["id"] = str(uuid.uuid4())
+            return sample_ret
 
     response = client.chat.completions.create(model="gpt-4",
     messages=[{"role": "user", "content": prompt}],

@@ -1,17 +1,26 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import * as React from 'react';
+import {
+	Drawer,
+	DrawerContent,
+	DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { DialogTitle } from '@radix-ui/react-dialog';
 
-export default function ChatWidget({ documentId, userId }) {
-	const [isOpen, setIsOpen] = useState(false);
-	const [messages, setMessages] = useState([]);
-	const [input, setInput] = useState('');
-	const [isLoading, setIsLoading] = useState(false);
-	const messagesEndRef = useRef(null);
+export default function ChatWidget({ documentId, userId, user, history=[] }) {
+    const [messages, setMessages] = React.useState(() => history || []);
+	const [input, setInput] = React.useState('');
+	const [isLoading, setIsLoading] = React.useState(false);
+	const messagesEndRef = React.useRef(null);
 
-	// Auto scroll to bottom on new message
-	useEffect(() => {
+    console.log("user", JSON.stringify(user));
+	React.useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
 
@@ -21,7 +30,6 @@ export default function ChatWidget({ documentId, userId }) {
 		setInput('');
 		setIsLoading(true);
 
-		// Add user message to history
 		setMessages(prev => [...prev, { from: 'user', text: userMessage }]);
 
 		let fullReply = '';
@@ -37,7 +45,6 @@ export default function ChatWidget({ documentId, userId }) {
 
 			fullReply += event.data;
 			setMessages(prev => {
-				// Append or update last AI message
 				const last = prev[prev.length - 1];
 				if (last && last.from === 'ai_streaming') {
 					return [...prev.slice(0, -1), { from: 'ai_streaming', text: fullReply }];
@@ -53,70 +60,86 @@ export default function ChatWidget({ documentId, userId }) {
 		};
 
 		evtSource.addEventListener("end", () => {
-			setMessages(prev => {
-				// finalize AI message
-				return prev.map(m => m.from === 'ai_streaming' ? { from: 'ai', text: m.text } : m);
-			});
+			setMessages(prev =>
+				prev.map(m =>
+					m.from === 'ai_streaming' ? { from: 'ai', text: m.text } : m
+				)
+			);
 			setIsLoading(false);
 		});
 	};
 
 	return (
 		<div className="fixed bottom-4 right-4 z-50">
-			{isOpen ? (
-				<div className="w-80 h-96 bg-white shadow-xl rounded-lg flex flex-col border border-gray-200">
-					<div className="p-3 bg-gray-800 text-white flex justify-between items-center rounded-t-lg">
-						<span>Chat Assistant</span>
-						<button onClick={() => setIsOpen(false)} className="text-white font-bold">&times;</button>
+			<Drawer direction="right">
+				<DrawerTrigger asChild>
+					<Button className="rounded-full shadow-lg">Open Chat</Button>
+				</DrawerTrigger>
+				<DrawerContent className="h-[80vh] max-h-screen w-[320px] md:w-[400px] mt-auto ml-auto mr-0 rounded-t-lg border bg-background flex flex-col">
+					<div className="p-3 border-b flex justify-between items-center">
+                        <DialogTitle>Chat Assistant</DialogTitle>
 					</div>
 
-					<div className="flex-1 overflow-y-auto p-3 space-y-2 text-sm">
-						{messages.map((msg, idx) => (
-							<div
-								key={idx}
-								className={`whitespace-pre-wrap px-3 py-2 rounded-md max-w-full ${
-									msg.from === 'user' ? 'bg-blue-100 self-end text-right' : 'bg-gray-100 self-start'
-								}`}
-							>
-								{msg.text}
-							</div>
-						))}
-						<div ref={messagesEndRef}></div>
-					</div>
+					<ScrollArea className="flex-1 p-3 space-y-6 overflow-y-auto text-sm">
+						{messages.map((msg, idx) => {
+							const isUser = msg.from === 'user';
+							return (
+								<div
+									key={idx}
+									className={cn(
+										"flex items-start gap-2 my-4",
+										isUser ? "justify-end" : "justify-start"
+									)}
+								>
+									{!isUser && (
+										<Avatar className="w-12 h-12">
+											<AvatarImage src="/assistant.png" />
+											<AvatarFallback>AI</AvatarFallback>
+										</Avatar>
+									)}
+									<div
+										className={cn(
+											"px-3 py-2 rounded-md max-w-[75%] whitespace-pre-wrap",
+											isUser
+												? "bg-primary text-primary-foreground"
+												: "bg-muted text-muted-foreground"
+										)}
+									>
+										{msg.text}
+									</div>
+									{isUser && (
+										<Avatar className="w-12 h-12">
+											<AvatarImage src={user.picture} />
+											<AvatarFallback>U</AvatarFallback>
+										</Avatar>
+									)}
+								</div>
+							);
+						})}
+						<div ref={messagesEndRef} />
+					</ScrollArea>
 
 					<form
 						onSubmit={(e) => {
 							e.preventDefault();
 							sendMessage();
 						}}
-						className="flex border-t border-gray-300 p-2"
+						className="flex items-center gap-2 p-3 border-t"
 					>
-						<input
-							className="flex-1 text-sm px-2 py-1 border rounded mr-2"
+						<Input
+							className="flex-1"
 							type="text"
 							value={input}
 							onChange={(e) => setInput(e.target.value)}
 							placeholder="Ask a question..."
 							disabled={isLoading}
 						/>
-						<button
-							className="bg-blue-600 text-white px-3 py-1 rounded disabled:opacity-50"
-							type="submit"
-							disabled={isLoading}
-						>
+						<Button type="submit" disabled={isLoading}>
 							Send
-						</button>
+						</Button>
 					</form>
-				</div>
-			) : (
-				<Button
-                    variant="primary"
-					onClick={() => setIsOpen(true)}
-					className="px-4 py-2 rounded-full shadow-lg"
-				>
-					Open Chat
-				</Button>
-			)}
+				</DrawerContent>
+			</Drawer>
 		</div>
 	);
 }
