@@ -23,8 +23,7 @@ async def ask_assistant(question, document_text, user_id):
     stream=True)
 
     for chunk in response:
-        delta = chunk.choices[0].delta
-        content = delta.get("content", "")
+        content = chunk.choices[0].delta.content or ""
         if content:
             print(content, end="", flush=True)
             yield content
