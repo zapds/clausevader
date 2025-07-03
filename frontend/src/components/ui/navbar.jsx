@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Button } from "./button";
 import { Menu } from "lucide-react";
 
-export default function NavBar() {
+
+export default function NavBar({ user }) {
   const pathname = usePathname();
 
   const linkClass = (href) =>
@@ -20,15 +22,18 @@ export default function NavBar() {
         </Link>
 
         <div className="space-x-4 hidden md:flex">
-          <Link href="/" className={linkClass("/")}>
-            Home
+        <Link href="/dashboard">
+          <Button variant="ghost">Dashboard</Button>
+        </Link>
+        {user ? (
+          <Link href="/logout">
+            <Button variant="ghost">Logout</Button>
           </Link>
-          <Link href="/dashboard" className={linkClass("/dashboard")}>
-            Dashboard
+        ) : (
+          <Link href="/login">
+            <Button variant="ghost">Login</Button>
           </Link>
-          <Link href="/login" className={linkClass("/login")}>
-            Login
-          </Link>
+        )}
         </div>
 
         {/* Mobile menu icon (optional for future expansion) */}

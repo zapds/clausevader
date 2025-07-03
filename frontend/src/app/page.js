@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, Flame } from "lucide-react";
 
+
 export default function Home() {
   return (
     <div className="bg-[url('/background.jpg')] bg-center min-h-screen font-sans flex flex-col crawl-container text-yellow-300">
