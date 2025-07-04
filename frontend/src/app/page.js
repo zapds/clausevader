@@ -23,12 +23,14 @@ export default function Home() {
                 <Flame className="mr-2 h-5 w-5 text-black" /><span className="text-black">Enter the Dark Side</span>
               </Button>
             </Link>
+            <Link href="/about">
             <Button
               variant="outline"
               className="border-yellow-300 bg-transparent text-yellow-300 hover:bg-red-700 hover:border-red-700 transition-all duration-300 text-base sm:text-lg px-2 py-4"
             >
               <ShieldAlert className="mr-2 h-5 w-5" /> Learn More
             </Button>
+            </Link>
           </div>
         </div>
       </section>
