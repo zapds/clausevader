@@ -1,6 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
+from fastapi import BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+
 from uuid import uuid4, UUID
 
 from db import SessionLocal
@@ -23,9 +25,47 @@ app.add_middleware(
 # UPLOAD_FOLDER = "uploads"
 # os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+def process_document(doc_id: UUID, extracted_text: str, role: str):
+    db = SessionLocal()
+
+    try:
+        analysis = analyze_clauses(extracted_text, role)
+        if "error" in analysis and analysis["error"] == True:
+            # Mark as failed
+            doc = db.query(Document).filter(Document.id == doc_id).first()
+            if doc:
+                doc.status = DocumentStatusEnum.failed
+                db.commit()
+            return
+
+        for clause in analysis['clause_graph']:
+            new_clause = Clause(
+                id=UUID(clause['id']) if isinstance(clause['id'], str) else clause['id'],
+                document_id=doc_id,
+                clause_text=clause['summary'],
+                summary=clause['summary'],
+                pros=clause.get("pros"),
+                cons=clause.get("cons"),
+                suggested_rewrite=clause.get("suggested_rewrite"),
+                sith_view=clause.get("sith_view"),
+                x=clause['x'],
+                y=clause['y'],
+                impact=clause['impact'],
+                favorability_score=int((1 - clause['x']) * 100)
+            )
+            db.add(new_clause)
+
+        doc = db.query(Document).filter(Document.id == doc_id).first()
+        if doc:
+            doc.favourability_score = analysis['favourability_score']
+            doc.status = DocumentStatusEnum.done
+            db.commit()
+    finally:
+        db.close()
 
 @app.post("/api/upload")
 async def upload_file(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     role: str = Form(...),
     user_id: int = Form(...)
@@ -36,10 +76,6 @@ async def upload_file(
         raise HTTPException(status_code=400, detail="Only PDF or DOCX allowed.")
 
     doc_id = uuid4()
-    # save_path = os.path.join(UPLOAD_FOLDER, f"{doc_id}_{file.filename}")
-
-    # with open(save_path, "wb") as buffer:
-    #     shutil.copyfileobj(file.file, buffer)
 
     extracted_text = extract_text_from_file(file)
 
@@ -47,43 +83,18 @@ async def upload_file(
         id=doc_id,
         user_id=user_id,
         filename=file.filename,
-        # original_file_url=save_path,
         extracted_text=extracted_text,
         role=role,
         status=DocumentStatusEnum.processing
     )
     db.add(new_doc)
     db.commit()
+    db.close()
 
-    # Analyze document
-    analysis = analyze_clauses(extracted_text, role)
-    if "error" in analysis and analysis["error"] == True:
-        return analysis
-
-    # Save clauses to DB
-    for clause in analysis['clause_graph']:
-        new_clause = Clause(
-            id=UUID(clause['id']) if isinstance(clause['id'], str) else clause['id'],
-            document_id=doc_id,
-            clause_text=clause['summary'],
-            summary=clause['summary'],
-            pros=clause.get("pros"),
-            cons=clause.get("cons"),
-            suggested_rewrite=clause.get("suggested_rewrite"),
-            sith_view=clause.get("sith_view"),
-            x=clause['x'],
-            y=clause['y'],
-            impact=clause['impact'],
-            favorability_score=int((1 - clause['x']) * 100)
-        )
-        db.add(new_clause)
-
-    new_doc.favourability_score = analysis['favourability_score']
-    new_doc.status = DocumentStatusEnum.done
-    db.commit()
+    # Kick off background task
+    background_tasks.add_task(process_document, doc_id, extracted_text, role)
 
     return {"document_id": str(doc_id), "status": "processing"}
-
 
 @app.get("/api/documents/{doc_id}/status")
 def check_status(doc_id: UUID):
