@@ -10,17 +10,17 @@ export async function GET() {
 	const cookieStore = await cookies();
 	cookieStore.set("google_oauth_state", state, {
 		path: "/",
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		maxAge: 60 * 10, // 10 minutes
-		sameSite: "lax"
+		// httpOnly: true,
+		// secure: process.env.NODE_ENV === "production",
+		// maxAge: 60 * 10, // 10 minutes
+		// sameSite: "lax"
 	});
 	cookieStore.set("google_code_verifier", codeVerifier, {
 		path: "/",
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		maxAge: 60 * 10, // 10 minutes
-		sameSite: "lax"
+		// httpOnly: true,
+		// secure: process.env.NODE_ENV === "production",
+		// maxAge: 60 * 10, // 10 minutes
+		// sameSite: "lax"
 	});
 
 	return new Response(null, {
