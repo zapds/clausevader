@@ -1,7 +1,8 @@
 # ⚖️ ClauseVader – The Sith-Lord Contract Analyzer
 
 ClauseVader is an AI-powered legal analysis tool that merges the power of GPT-4 with the mystique of the dark side. Upload any `.pdf` or `.docx` contract, and ClauseVader will break it down into understandable clauses, evaluate its risks and fairness, and even let you chat with your very own Sith Lord legal assistant.
-
+Explore ClauseVader in action:
+👉 https://clausevader.vercel.app/
 > “You may upload the agreement… but it does not favor you.” – ClauseVader
 
 ---
