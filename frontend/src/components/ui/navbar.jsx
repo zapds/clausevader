@@ -27,7 +27,7 @@ export default function NavBar({ user }) {
             <Button variant="ghost">Dashboard</Button>
           </Link>
           {user ? (
-            <Link href="/logout">
+            <Link href="/">
               <Button variant="ghost">Logout</Button>
             </Link>
           ) : (
@@ -52,7 +52,7 @@ export default function NavBar({ user }) {
                 </DropdownMenuItem>
               </Link>
               {user ? (
-                <Link href="/logout" passHref>
+                <Link href="/" passHref>
                   <DropdownMenuItem className="cursor-pointer hover:bg-red-900">
                     Logout
                   </DropdownMenuItem>
