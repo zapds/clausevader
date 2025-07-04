@@ -17,6 +17,12 @@ export default function ChatWidget({ documentId, userId, user, history = [] }) {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 	}, [messages]);
 
+    React.useEffect(() => {
+        if (messages.length === 0) {
+            setMessages([{from: 'ai', text: "Greetings, mortal! What assistance do you seek with the dark side of the law?"}])
+        }
+    }, [messages]);
+    
 	const sendMessage = async () => {
 		if (!input.trim()) return;
 		const userMessage = input.trim();
@@ -63,7 +69,7 @@ export default function ChatWidget({ documentId, userId, user, history = [] }) {
 	return (
             <div className="h-[80%] max-w-md bg-background border rounded-lg shadow-lg flex flex-col">
                 <div className="p-3 border-b flex justify-between items-center">
-                    <h2 className="text-lg font-semibold">Speak with the Shadows</h2>
+                    <h2 className="text-lg font-semibold">Speak with the Shadows about your document</h2>
                 </div>
 
                 <ScrollArea className="flex-1 p-3 space-y-6 overflow-y-auto text-sm">
