@@ -8,6 +8,32 @@ Explore ClauseVader in action:
 
 ---
 
+## Problem Statement
+Legal contracts are often written in complex, technical language that makes them difficult for non-lawyers to understand. Individuals and small businesses frequently sign agreements without fully grasping the implications of each clause—leading to unfavorable terms, hidden risks, and costly misunderstandings.
+
+There is a lack of accessible tools that can:
+
+* Break down contract language into simple, understandable summaries,
+* Evaluate clauses for fairness and legal risk, and
+* Allow users to engage interactively with their contracts to clarify concerns.
+
+Traditional legal review is expensive, slow, and inaccessible to many. In a world where agreements are signed daily—leases, NDAs, partnerships, terms of service—there is an urgent need for an intelligent, user-friendly system that makes legal documents transparent and comprehensible.
+
+---
+
+## Hackathon Info
+Track: Full Stack
+
+Challenges completed:
+- Challenge 1: Colour Theme
+  - Our colour theme is set as black and red (dark mode) to match the Sith vibes
+- Challenge 2: Easter Egg
+  - Our landing page includes a 3D animation that's also an easter egg to the Star Wars crawl intro
+- Challenge 4: 3D Animation
+  - Our landing page includes a 3D animation intro
+
+---
+
 ## 🚀 Features
 ![Screenshot](frontend/public/screenshot.png)
 - 📄 **File Upload Support**: Upload `.pdf` or `.docx` contracts.
